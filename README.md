@@ -22,25 +22,16 @@ Generates bindings file `path/to/definitions.cs`
 
 # How to integrate bindings
 
-To integrate the bindings into your projects, simply add the generated bindings file to your project.
-There are a few requirements depending on your target framework version.
+To integrate the bindings into your project, add the generated C# file and enable unsafe code. The
+file is self-contained, uses C# 9 syntax, and targets .NET Standard 2.1; no compatibility NuGet
+package is required. This language baseline is compatible with Unity 6's C# compiler.
 
-- .NET core `8.0` or higher
+- .NET Standard 2.1
     ```xml
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <LangVersion>9.0</LangVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    </PropertyGroup>
-    ```
-
-- .NET framework `4.6.1`
-    ```xml
-    <PropertyGroup>
-        <TargetFramework>net461</TargetFramework>
-        <LangVersion>10.0</LangVersion>
-        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-        <PackageReference Include="PolySharp" Version="1.15.0"/>
     </PropertyGroup>
     ```
 

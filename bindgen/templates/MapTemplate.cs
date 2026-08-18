@@ -8,11 +8,9 @@ class {{ ffi_converter_name }}: FfiConverterRustBuffer<{{ type_name }}> {
     public override {{ type_name }} Read(BigEndianStream stream) {
         var len = stream.ReadInt();
         var result = new {{ type_name }}(len);
-        var readerKey = {{ key_type|read_fn }};
-        var readerValue = {{ value_type|read_fn }};
         for (int i = 0; i < len; i++) {
-            var key = readerKey(stream);
-            var value = readerValue(stream);
+            var key = {{ key_type|read_fn }}(stream);
+            var value = {{ value_type|read_fn }}(stream);
             result[key] = value;
         }
 
@@ -27,9 +25,9 @@ class {{ ffi_converter_name }}: FfiConverterRustBuffer<{{ type_name }}> {
             return sizeForLength;
         }
 
-        var allocationKeySizeFn = {{ key_type|allocation_size_fn }};
-        var allocationKValueSizeFn = {{ value_type|allocation_size_fn }};
-        var sizeForItems = value.Sum(item => allocationKeySizeFn(item.Key) + allocationKValueSizeFn(item.Value));
+        var sizeForItems = value.Sum(item =>
+            {{ key_type|allocation_size_fn }}(item.Key) +
+            {{ value_type|allocation_size_fn }}(item.Value));
         return sizeForLength + sizeForItems;
     }
 
@@ -41,11 +39,9 @@ class {{ ffi_converter_name }}: FfiConverterRustBuffer<{{ type_name }}> {
         }
 
         stream.WriteInt(value.Count);
-        var writerKey = {{ key_type|write_fn }};
-        var writerValue = {{ value_type|write_fn }};
         foreach (var item in value) {
-            writerKey(item.Key, stream);
-            writerValue(item.Value, stream);
+            {{ key_type|write_fn }}(item.Key, stream);
+            {{ value_type|write_fn }}(item.Value, stream);
         }
     }
 }

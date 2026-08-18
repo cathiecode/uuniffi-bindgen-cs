@@ -30,8 +30,17 @@
 using {{ imported_class }};
 {%- endfor %}
 
+// Records use this compiler marker, but netstandard2.1 does not define it.
+// Keep the declaration partial so multiple generated binding files can be
+// compiled into the same assembly without requiring a compatibility package.
+#if !NET5_0_OR_GREATER
+namespace System.Runtime.CompilerServices {
+    internal sealed partial class IsExternalInit {}
+}
+#endif
+
 {%- call cs::docstring_value(ci.namespace_docstring(), 0) %}
-namespace {{ config.namespace() }};
+namespace {{ config.namespace() }} {
 
 {%- for alias in self.type_aliases() %}
 using {{ alias.alias }} = {{ alias.original_type }};
@@ -62,6 +71,8 @@ using {{ alias.alias }} = {{ alias.original_type }};
 {%- for func in ci.function_definitions() %}
 {%- include "TopLevelFunctionTemplate.cs" %}
 {%- endfor %}
+}
+
 }
 
 {% import "macros.cs" as cs %}

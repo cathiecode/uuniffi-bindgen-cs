@@ -10,13 +10,12 @@ class {{ ffi_converter_name }}: FfiConverterRustBuffer<{{ inner_type_name }}[]> 
     public override {{ inner_type_name }}[]  Read(BigEndianStream stream) {
         var length = stream.ReadInt();
         if (length == 0) {
-            return [];
+            return System.Array.Empty<{{ inner_type_name }}>();
         }
 
         var result = {{ inner_type_name|array_new_expr }};
-        var readFn = {{ inner_type|read_fn }};
         for (int i = 0; i < length; i++) {
-            result[i] = readFn(stream);
+            result[i] = {{ inner_type|read_fn }}(stream);
         }
         return result;
     }
@@ -29,8 +28,7 @@ class {{ ffi_converter_name }}: FfiConverterRustBuffer<{{ inner_type_name }}[]> 
             return sizeForLength;
         }
 
-        var allocationSizeFn = {{ inner_type|allocation_size_fn }};
-        var sizeForItems = value.Sum(item => allocationSizeFn(item));
+        var sizeForItems = value.Sum(item => {{ inner_type|allocation_size_fn }}(item));
         return sizeForLength + sizeForItems;
     }
 
@@ -42,7 +40,6 @@ class {{ ffi_converter_name }}: FfiConverterRustBuffer<{{ inner_type_name }}[]> 
         }
 
         stream.WriteInt(value.Length);
-        var writerFn = {{ inner_type|write_fn }};
-        value.ForEach(item => writerFn(item, stream));
+        value.ForEach(item => {{ inner_type|write_fn }}(item, stream));
     }
 }

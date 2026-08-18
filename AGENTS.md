@@ -34,7 +34,8 @@ make all
   `<UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>`.
 - `UniffiCS.BindingTests` targets **net9.0** (downgraded from net10.0 in commit 6395dea until the CI
   image is updated).
-- The generated bindings library `UniffiCS` dual-targets **netstandard2.0** + **net8.0**.
+- The generated bindings library `UniffiCS` targets **netstandard2.1** with **C# 9.0** syntax and
+  no compatibility packages.
 
 ### Run a single test
 
@@ -97,8 +98,8 @@ Each UniFFI type has a Rust module in `gen_cs/` implementing the `CodeType` trai
 
 ### C# Output Targets
 
-Generated code supports both .NET Framework 4.6.1+ and .NET 8.0+, with conditional compilation
-(`NET8_0_OR_GREATER`) for platform differences like `LibraryImport` vs `DllImport`.
+Generated code directly supports C# 9.0 and .NET Standard 2.1. Newer runtimes use conditional compilation
+(`NET8_0_OR_GREATER`) for optimizations such as `LibraryImport`; the baseline uses `DllImport`.
 
 ## Key Conventions
 

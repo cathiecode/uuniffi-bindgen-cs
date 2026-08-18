@@ -38,7 +38,7 @@ uniffi-bindgen-cs path/to/definitions.udl --config path/to/uniffi.toml
         will be expanded into variable containing the custom value. The expression is used in a
         return statement, i.e. `return <expression(value);>`.
 
-- `namespace` - override the `namespace ..;` declaration in generated bindings file. The default is
+- `namespace` - override the `namespace .. { }` declaration in generated bindings file. The default is
     `uniffi.{{namespace}}`, where `namespace` is the namespace from UDL file.
     ```toml
     # emits `namespace com.example.greeter;` in generated bindings file

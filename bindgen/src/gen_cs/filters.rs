@@ -39,6 +39,16 @@ pub(super) fn type_name_custom(
     }
 }
 
+pub(super) fn sequence_inner_type_name(
+    typ: &Type,
+    ci: &ComponentInterface,
+) -> Result<Option<String>, askama::Error> {
+    match typ {
+        Type::Sequence { inner_type } => Ok(Some(type_name(inner_type, ci)?)),
+        _ => Ok(None),
+    }
+}
+
 pub(super) fn canonical_name(as_ct: &impl AsCodeType) -> Result<String, askama::Error> {
     Ok(as_ct.as_codetype().canonical_name())
 }

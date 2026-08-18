@@ -4,6 +4,34 @@
 
 {%- match config.custom_types.get(name.as_str())  %}
 {%- when None %}
+{%- let sequence_inner_type_name = builtin|sequence_inner_type_name(ci) %}
+{%- match sequence_inner_type_name %}
+{%- when Some with (inner_type_name) %}
+{# C# only supports aliases to array types starting with C# 12.  Use a named
+   collection and an adapting converter so Unity's C# 9 compiler can consume
+   custom types whose built-in representation is a sequence. #}
+{% let builtin_ffi_converter = builtin|ffi_converter_name %}
+{{ config.access_modifier() }} class {{ name }} : List<{{ inner_type_name }}> {
+    public {{ name }}() {}
+    public {{ name }}(IEnumerable<{{ inner_type_name }}> items) : base(items) {}
+}
+
+class {{ ffi_converter_name }}: FfiConverterRustBuffer<{{ name }}> {
+    public static {{ ffi_converter_name }} INSTANCE = new {{ ffi_converter_name }}();
+
+    public override {{ name }} Read(BigEndianStream stream) {
+        return new {{ name }}({{ builtin_ffi_converter }}.INSTANCE.Read(stream));
+    }
+
+    public override int AllocationSize({{ name }} value) {
+        return {{ builtin_ffi_converter }}.INSTANCE.AllocationSize(value.ToArray());
+    }
+
+    public override void Write({{ name }} value, BigEndianStream stream) {
+        {{ builtin_ffi_converter }}.INSTANCE.Write(value.ToArray(), stream);
+    }
+}
+{%- else %}
 {#- Define the type using typealiases to the builtin #}
 /**
  * Typealias from the type name used in the UDL file to the builtin type.  This
@@ -14,6 +42,7 @@
 {% let type_name_converter = builtin|ffi_converter_name %}
 {{- self.add_type_alias(name, type_name_custom) }}
 {{- self.add_type_alias(ffi_converter_name, type_name_converter) }}
+{%- endmatch %}
 
 {%- when Some with (config) %}
 
